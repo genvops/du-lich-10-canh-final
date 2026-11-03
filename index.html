@@ -15,7 +15,7 @@
 <nav class="mapbar" id="mapBar"></nav>
 <footer>Du lịch online - Không cần visa - Share cho bạn bè cùng đi • <a href="live.html" style="color:#fde68a">Vào trang /live TikTok</a> • <a href="control.html" style="color:#fde68a">Trang /control cho host</a> • Số LIVE là mô phỏng trong game cho vui.</footer>
 <div id="flyOverlay"><div>✈️</div><p>Đang bay tới map tiếp theo...</p></div><div id="giftPopup"></div><div id="prayText">🙏 CẦU AN<br><span style="font-size:22px">BÌNH AN • MAY MẮN • TÀI LỘC</span></div>
-<div class="modal" id="passportModal"><div class="card"><h2>🏆 Hộ chiếu Vàng</h2><p class="note">Top 10 người đi hết 6 map nhanh nhất (trong game này). Bạn đi hết 6 map sẽ tự lên bảng.</p><div id="passList"></div><button class="ghost" onclick="document.getElementById('passportModal').classList.remove('open')">Đóng</button></div></div>
+<div class="modal" id="passportModal"><div class="card"><h2>🏆 Hộ chiếu Vàng</h2><p class="note">Top 10 người đi hết 10 cổng nhanh nhất (trong game này). Bạn đi hết 10 cổng sẽ tự lên bảng.</p><div id="passList"></div><button class="ghost" onclick="document.getElementById('passportModal').classList.remove('open')">Đóng</button></div></div>
 <div class="modal" id="checkinModal"><div class="card"><h2>📸 Check-in thành công!</h2><img id="checkinImg" alt="Ảnh check-in"><p id="checkinText"></p><button onclick="downloadCheckin()">⬇️ Tải ảnh</button><button onclick="shareMe()">🔗 Share</button><button class="ghost" onclick="document.getElementById('checkinModal').classList.remove('open')">Đóng</button></div></div>
 <script type="module">
 import {MAPS,createWorld} from './assets/world.js'; import {state,initCommon,buildMapBar,startFakeLive,passportList} from './assets/app.js'; import {createMusic} from './assets/music.js';
