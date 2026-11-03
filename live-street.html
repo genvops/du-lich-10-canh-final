@@ -1,0 +1,80 @@
+<!DOCTYPE html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Live Dọc - Quán Ăn Vặt Vỉa Hè</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#000;display:flex;justify-content:center;font-family:Arial,Helvetica,sans-serif}
+.phone{position:relative;width:390px;max-width:100vw;height:844px;max-height:100vh;overflow:hidden;background:#111;color:#fff}
+.bg{position:absolute;inset:0;background:url('https://img.vietcetera.com/uploads/images/17-dec-2021/ak1a8524-min.jpg') center/cover no-repeat,linear-gradient(#222,#111)}
+.bg:after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.55),transparent 30%,transparent 60%,rgba(0,0,0,.75))}
+.top{position:absolute;top:0;left:0;right:0;z-index:5;padding:10px;display:flex;align-items:center;gap:8px}
+.avatar{width:42px;height:42px;border-radius:50%;background:#ffd700;color:#000;font-weight:900;display:flex;align-items:center;justify-content:center;border:2px solid #fff;flex-shrink:0}
+.follow{background:#fe2c55;color:#fff;border:0;border-radius:999px;padding:8px 14px;font-weight:800;cursor:pointer}
+.livebadge{background:#fe2c55;padding:6px 10px;border-radius:8px;font-weight:800;font-size:12px}
+.viewers{font-size:12px;background:rgba(0,0,0,.55);padding:6px 10px;border-radius:999px}
+.menu{position:absolute;top:62px;left:8px;z-index:5;display:flex;flex-direction:column;gap:6px}
+.chip{background:rgba(0,0,0,.65);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:12px;padding:7px 10px;font-size:12px;text-align:left;cursor:pointer}
+.chip b{color:#ffd700}
+.leader{position:absolute;top:62px;right:8px;z-index:5;background:rgba(0,0,0,.55);border-radius:12px;padding:8px;font-size:12px;text-align:left}
+.leader b{color:#ffd700}
+.scene{position:absolute;inset:0;z-index:2}
+.cart{position:absolute;background:#f59e0b;border-radius:10px;padding:6px 8px;font-size:26px;box-shadow:0 6px 16px rgba(0,0,0,.5)}
+.cart .roof{position:absolute;top:-14px;left:0;right:0;height:14px;background:#2563eb;border-radius:8px 8px 0 0}
+.table{position:absolute;background:#dc2626;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.5)}
+.chair{position:absolute;width:18px;height:18px;background:#ef4444;border-radius:4px}
+.person{position:absolute;text-align:center;font-size:38px;text-shadow:0 2px 8px #000;animation:bob 2.5s ease-in-out infinite}
+.person .bubble{position:absolute;bottom:44px;left:50%;transform:translateX(-50%);background:#fff;color:#111;font-size:11px;padding:5px 8px;border-radius:12px;white-space:nowrap;font-weight:700}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.feed{position:absolute;left:8px;bottom:72px;z-index:6;width:260px;display:flex;flex-direction:column;gap:6px}
+.msg{background:rgba(0,0,0,.55);border-radius:12px;padding:7px 10px;font-size:13px}
+.msg b{color:#ffd700}
+.join{position:absolute;left:8px;bottom:340px;z-index:6;background:rgba(0,0,0,.6);padding:8px 12px;border-radius:999px;font-size:13px}
+.giftfly{position:absolute;right:16px;bottom:180px;z-index:7;font-size:42px;animation:fly 2.5s ease-out forwards}
+@keyframes fly{from{transform:translateY(40px) scale(.6);opacity:0}20%{opacity:1}to{transform:translateY(-220px) scale(1.2);opacity:0}}
+.bottom{position:absolute;left:0;right:0;bottom:0;z-index:8;display:flex;gap:6px;padding:10px;background:linear-gradient(180deg,transparent,rgba(0,0,0,.85))}
+.bottom input{flex:1;border:0;border-radius:999px;padding:12px 14px;background:rgba(255,255,255,.15);color:#fff;outline:none}
+.bottom input::placeholder{color:#ddd}
+.bottom button{border:0;border-radius:50%;width:46px;height:46px;font-size:20px;cursor:pointer;background:#fff}
+.bottom button.rose{background:#fe2c55;color:#fff}
+.toast{position:absolute;top:120px;left:50%;transform:translateX(-50%);z-index:9;background:#ffd700;color:#000;font-weight:800;padding:10px 16px;border-radius:999px;white-space:nowrap;display:none}
+@media(max-width:420px){.phone{height:100vh}}
+</style></head><body>
+<div class="phone">
+<div class="bg"></div>
+<div class="top"><div class="avatar">🍜</div><div style="flex:1;text-align:left"><b>Quán Ăn Vặt Live</b><br><span style="font-size:12px;color:#ffe98a">🔴 LIVE • <span id="viewCount">1.343</span> đang xem • DEMO</span></div><button class="follow" onclick="this.textContent='✓ Đang theo dõi'">+ Follow</button><span class="livebadge">LIVE</span></div>
+<div class="menu">
+<button class="chip" onclick="order('Trà Đào')">🍑 Trà Đào<br><b>20 xu</b></button>
+<button class="chip" onclick="order('Cafe Sữa')">☕ Cafe Sữa<br><b>25 xu</b></button>
+<button class="chip" onclick="order('Bánh Mì')">🥖 Bánh Mì<br><b>30 xu</b></button>
+<button class="chip" onclick="order('Coca')">🥤 Coca<br><b>20 xu</b></button>
+</div>
+<div class="leader">🏆 Top tặng quà<br>🥇 Bạn A — 333 xu<br>🥈 Bạn B — 131 xu<br>🥉 Bạn C — 102 xu</div>
+<div class="scene">
+<div class="cart" style="left:18px;top:280px"><div class="roof"></div>🍜🥤</div>
+<div class="cart" style="right:18px;top:270px"><div class="roof"></div>🍢🍡</div>
+<div class="table" style="left:110px;top:520px;width:70px;height:44px"></div>
+<div class="chair" style="left:100px;top:500px"></div><div class="chair" style="left:180px;top:530px"></div>
+<div class="table" style="right:30px;top:600px;width:70px;height:44px"></div>
+<div class="chair" style="right:110px;top:590px"></div>
+<div class="person" style="left:26px;top:360px"><div class="bubble">Cho 1 ly trà đào!</div>👩</div>
+<div class="person" style="left:150px;top:400px;animation-delay:.5s"><div class="bubble">Ngon quá!</div>👨</div>
+<div class="person" style="right:30px;top:380px;animation-delay:1s"><div class="bubble">Quán này đông ghê</div>🧑</div>
+<div class="person" style="left:90px;top:470px;animation-delay:1.4s">👩‍🍳</div>
+</div>
+<div class="join" id="joinMsg">👋 Bạn mới vừa tham gia live</div>
+<div class="feed" id="feed"></div>
+<div class="bottom"><input id="cmt" placeholder="Nhập bình luận..." onkeydown="if(event.key==='Enter')sendCmt()"><button onclick="sendCmt()">💬</button><button class="rose" onclick="sendRose()">🌹</button><button onclick="sendHeart()">❤️</button></div>
+<div class="toast" id="toast"></div>
+</div>
+<script>
+const feed=document.getElementById('feed');
+const names=['Minh','Hằng','Tuấn','Linh','An','Phương','Khánh','Vy'];
+function addMsg(name,text){const d=document.createElement('div');d.className='msg';d.innerHTML='<b>'+name+':</b> '+text;feed.appendChild(d);while(feed.children.length>5)feed.removeChild(feed.firstChild);}
+function toast(t){const el=document.getElementById('toast');el.textContent=t;el.style.display='block';setTimeout(()=>el.style.display='none',2500);}
+function order(m){toast('✅ Đã gọi '+m+' — chờ 1 chút nhé!');addMsg('Bạn','Đã gọi '+m);}
+function sendCmt(){const v=document.getElementById('cmt').value.trim();if(!v)return;addMsg('Bạn',v);document.getElementById('cmt').value='';}
+function sendRose(){const g=document.createElement('div');g.className='giftfly';g.textContent='🌹 x1';document.querySelector('.phone').appendChild(g);setTimeout(()=>g.remove(),2600);addMsg('Bạn','đã tặng 🌹 Hoa hồng x1');toast('🌹 Cảm ơn Bạn đã tặng Hoa hồng!');}
+function sendHeart(){toast('❤️ Bạn đã thả tim!');}
+const comments=['Quán này ở đâu vậy?','Nhìn ngon quá đi','Cho 1 phần bánh mì','Trà đào best luôn','Đông vui quá','Ship không shop?'];
+setInterval(()=>{addMsg(names[Math.floor(Math.random()*names.length)],comments[Math.floor(Math.random()*comments.length)]);},4500);
+setInterval(()=>{document.getElementById('joinMsg').textContent='👋 '+names[Math.floor(Math.random()*names.length)]+' vừa tham gia live';document.getElementById('viewCount').textContent=(1300+Math.floor(Math.random()*120)).toLocaleString('vi-VN');},7000);
+addMsg('Hằng','Quán này đông vui quá!');addMsg('Tuấn','Cho 1 ly trà đào!');addMsg('Linh','Nhìn thèm quá đi');
+</script></body></html>
