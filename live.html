@@ -1,0 +1,30 @@
+<!DOCTYPE html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>/live - Du lịch cùng TikTok Live</title><link rel="stylesheet" href="assets/style.css">
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}</script></head>
+<body>
+<header class="topbar"><span class="live">🔴 LIVE TikTok</span><b>🌍 Du lịch cùng viewer</b><button class="pill" onclick="location.href='index.html'">🏠 Về trang chính</button><button class="pill" onclick="location.href='control.html'">🎛️ Control</button></header>
+<div id="canvasWrap" style="inset:52px 0 0 0"><canvas id="scene"></canvas><div id="mapTitle"><h1>🌀 Trung tâm 10 cổng dịch chuyển 6D</h1><p>Viewer comment số 1-10 hoặc tên cổng để bay qua cổng • Đã đi <span id="progress">1/10</span> cổng</p></div><div id="userBadge">👤 <span id="userName"></span> 🇻🇳</div></div>
+<div class="panel"><h3 style="margin:0">🎥 Kết nối TikTok Live</h3>
+<input id="ttUser" placeholder="@username TikTok của bạn, ví dụ @dulichonline">
+<button style="width:100%;padding:12px;border:0;border-radius:12px;background:#ef4444;color:#fff;font-weight:800;cursor:pointer" onclick="connectTT()">🔴 Kết nối Live</button>
+<p id="ttStatus" class="note">Chưa kết nối. Trên GitHub Pages (web tĩnh) sẽ chạy ở chế độ mô phỏng comment/quà tặng để demo. Muốn kết nối live thật, chạy server trong thư mục <code>server/</code> theo README, rồi mở web qua server đó.</p>
+<div class="grid2"><button onclick="simGift('Hoa hồng',10)">🌹 Tặng Hoa hồng x10</button><button onclick="simGift('Bóng bay',5)">🎈 Tặng Bóng bay x5</button><button onclick="simGift('Du thuyền',1)">🛥️ Tặng Du thuyền x1</button><button onclick="simGift('Tim',20)">❤️ Tặng Tim x20</button></div>
+<input id="manualComment" placeholder="Nhập comment thử: 3, giza, tim, kyoto..."><button style="width:100%;padding:11px;border:0;border-radius:12px;background:#0ea5e9;color:#fff;font-weight:800;cursor:pointer" onclick="sendManual()">Gửi comment thử</button>
+<h4>💬 Comment TikTok (mô phỏng)</h4><div class="feed" id="feed"></div>
+<p class="note">Lệnh 10 cổng: 1 Hội An • 2 Hạ Long • 3 Wat Arun • 4 Kyoto • 5 Tử Cấm Thành • 6 Paris • 7 Santorini • 8 Iceland • 9 Maldives • 10 Dubai • “tim” = thả tim • Quà: Hoa hồng = pháo hoa tim, Bóng bay = đèn trời, Du thuyền = mưa tiền/hoa. Vào cổng chùa Thái/Trung sẽ tự hiện nút 🙏 Cầu an ở trang chính.</p>
+<div class="musicbar" style="position:static;width:auto;margin-top:10px"><b id="musicName">🎵 Nhạc theo cổng</b><br><button id="musicToggle">🔊 Tắt nhạc</button><button class="ghost" onclick="document.getElementById('musicFile').click()">⬆️ Upload nhạc cho cổng này</button><input type="file" id="musicFile" accept="audio/*" hidden><br><label>Âm lượng <input type="range" id="musicVol" min="0" max="100" value="70"></label></div>
+</div><div id="giftPopup"></div><div id="flyOverlay"><div>✈️</div><p>Đang bay tới map tiếp theo...</p></div>
+<script type="module">
+import {MAPS,createWorld} from './assets/world.js'; import {state,initCommon,parseComment,giftEffect,showGift,addFeed,NAMES} from './assets/app.js'; import {createMusic} from './assets/music.js';
+const world=createWorld(document.getElementById('scene')); const goMap=initCommon(world); document.getElementById('userName').textContent=state.user; world.setUserName(state.user);
+const music=createMusic(); window.__music=music; music.onBeat(()=>world.pulseBeat()); music.updateLabel();
+document.getElementById('musicToggle').onclick=()=>music.toggle(); document.getElementById('musicVol').oninput=e=>music.setVolume(e.target.value/100); document.getElementById('musicFile').onchange=e=>{if(e.target.files[0])music.uploadForCurrent(e.target.files[0]);};
+document.addEventListener('pointerdown',()=>{if(!window.__musicStarted){window.__musicStarted=true;music.playMap(0);}}, {once:true});
+let connected=false, simTimer=null;
+window.connectTT=()=>{const u=document.getElementById('ttUser').value.trim()||'@dulichonline'; connected=true; document.getElementById('ttStatus').textContent='✅ Đã kết nối '+u+' ở chế độ mô phỏng trên GitHub Pages. Comment mô phỏng sẽ tự chạy bên dưới. Để live thật, xem README mục server/.';
+ if(simTimer)clearInterval(simTimer); simTimer=setInterval(()=>{const user=NAMES[Math.floor(Math.random()*NAMES.length)]+Math.floor(Math.random()*99); const pool=['1','2','3','4','5','6','7','8','9','10','paris','kyoto','tim','thai','maldives','dubai','❤️']; const c=pool[Math.floor(Math.random()*pool.length)]; parseComment(user,c,world,goMap); if(state.channel)state.channel.postMessage({type:'chat',user,text:c});},5000);};
+window.simGift=(gift,count)=>{const user=NAMES[Math.floor(Math.random()*NAMES.length)]; giftEffect(gift,world); showGift(user,gift,count); addFeed(user,'đã tặng '+gift+' x'+count,gift); if(state.channel)state.channel.postMessage({type:'gift',user,gift,count}); if(gift.includes('Du thuyền'))goMap(3);};
+window.sendManual=()=>{const v=document.getElementById('manualComment').value.trim(); if(!v)return; parseComment('Bạn',v,world,goMap); document.getElementById('manualComment').value='';};
+// Nhận lệnh từ trang control
+if(state.channel){const old=state.channel.onmessage; state.channel.onmessage=e=>{if(old)old(e); const d=e.data||{}; if(d.type==='gift'){giftEffect(d.gift,world); showGift(d.user,d.gift,d.count);} };}
+</script></body></html>

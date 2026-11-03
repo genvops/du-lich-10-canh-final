@@ -1,0 +1,41 @@
+<!DOCTYPE html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Du Lịch Vòng Quanh Thế Giới Online - Không cần visa</title><link rel="stylesheet" href="assets/style.css">
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}</script></head>
+<body>
+<header class="topbar"><span class="live">🔴 LIVE · <span id="liveCount">647 người đang du lịch cùng bạn</span></span><b>🌍 Du lịch online</b><span style="font-size:11px;background:rgba(0,0,0,.35);padding:6px 10px;border-radius:999px;white-space:nowrap">DESTINATION SYNC: 10/10 | 6D VIRTUAL TOURISM ACTIVE</span>
+<button class="pill" onclick="document.getElementById('passportModal').classList.add('open')">🏆 Hộ chiếu Vàng</button></header>
+<div class="musicbar"><b id="musicName">🎵 Đang phát: Nhạc Việt Nam - Hội An (Đàn Tranh + chuông chùa)</b><span class="note" style="color:#cbd5e1">Bay tới cổng nào, nhạc tự đổi sang nước đó (crossfade 2s). File mp3 trong public/music/ còn trống sẽ tự dùng nhạc Web Audio thay thế.</span><br>
+<button id="musicToggle">🔊 Tắt nhạc</button><button class="ghost" id="musicUploadLabel" onclick="document.getElementById('musicFile').click()">⬆️ Upload nhạc cho cổng này</button><button class="ghost" id="musicClear">↩️ Dùng nhạc mặc định</button>
+<input type="file" id="musicFile" accept="audio/*" hidden><br><label>Âm lượng <input type="range" id="musicVol" min="0" max="100" value="70"></label></div>
+<div class="ticker"><span id="tickerText">Minh vừa check-in Paris • Hằng vừa tới Nhật Bản • An vừa thả tim ở Hội An • Linh vừa tới Maldives •</span></div>
+<div id="canvasWrap"><canvas id="scene"></canvas><div id="mapTitle"><h1>🌀 Trung tâm 10 cổng dịch chuyển 6D</h1><p>Cực quang, đèn lồng Hội An, hoa rơi • Bấm 1 cổng để bay tới • Đã đi <span id="progress">1/10</span> cổng</p></div><div id="userBadge">👤 <span id="userName"></span> 🇻🇳</div></div>
+<div class="actions">
+<button onclick="checkin()">📸 Check-in</button><button onclick="heart()">❤️ Thả tim</button><button onclick="wave()">👋 Vẫy chào</button><button class="primary" onclick="nextMap()">✈️ Đi tiếp</button><button id="prayBtn" style="display:none;background:#facc15" onclick="pray()">🙏 Cầu an</button><button onclick="backHub()">🌀 Về trung tâm</button><button onclick="shareMe()">🔗 Share</button>
+</div>
+<nav class="mapbar" id="mapBar"></nav>
+<footer>Du lịch online - Không cần visa - Share cho bạn bè cùng đi • <a href="live.html" style="color:#fde68a">Vào trang /live TikTok</a> • <a href="control.html" style="color:#fde68a">Trang /control cho host</a> • Số LIVE là mô phỏng trong game cho vui.</footer>
+<div id="flyOverlay"><div>✈️</div><p>Đang bay tới map tiếp theo...</p></div><div id="giftPopup"></div><div id="prayText">🙏 CẦU AN<br><span style="font-size:22px">BÌNH AN • MAY MẮN • TÀI LỘC</span></div>
+<div class="modal" id="passportModal"><div class="card"><h2>🏆 Hộ chiếu Vàng</h2><p class="note">Top 10 người đi hết 6 map nhanh nhất (trong game này). Bạn đi hết 6 map sẽ tự lên bảng.</p><div id="passList"></div><button class="ghost" onclick="document.getElementById('passportModal').classList.remove('open')">Đóng</button></div></div>
+<div class="modal" id="checkinModal"><div class="card"><h2>📸 Check-in thành công!</h2><img id="checkinImg" alt="Ảnh check-in"><p id="checkinText"></p><button onclick="downloadCheckin()">⬇️ Tải ảnh</button><button onclick="shareMe()">🔗 Share</button><button class="ghost" onclick="document.getElementById('checkinModal').classList.remove('open')">Đóng</button></div></div>
+<script type="module">
+import {MAPS,createWorld} from './assets/world.js'; import {state,initCommon,buildMapBar,startFakeLive,passportList} from './assets/app.js'; import {createMusic} from './assets/music.js';
+const world=createWorld(document.getElementById('scene')); const goMap=initCommon(world); buildMapBar(goMap); startFakeLive();
+const music=createMusic(); window.__music=music; music.onBeat(()=>world.pulseBeat()); music.updateLabel();
+document.getElementById('userName').textContent=state.user; world.setUserName(state.user);
+document.getElementById('musicToggle').onclick=()=>music.toggle();
+document.getElementById('musicVol').oninput=e=>music.setVolume(e.target.value/100);
+document.getElementById('musicFile').onchange=e=>{if(e.target.files[0])music.uploadForCurrent(e.target.files[0]);};
+document.getElementById('musicClear').onclick=()=>music.clearUploadForCurrent();
+document.addEventListener('pointerdown',()=>{if(state.map===0&&!window.__musicStarted){window.__musicStarted=true;music.playMap(0);}}, {once:true});
+window.pray=()=>{world.bell(); world.pray(); world.effect('firework'); music.fireworkSound(); const t=document.getElementById('prayText'); t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); alert('🙏 Bạn đang chắp tay lạy, cầu an bình an may mắn!');};
+window.checkin=()=>{const img=world.screenshot(); const m=MAPS[state.map]; document.getElementById('checkinImg').src=img; document.getElementById('checkinText').textContent=state.user+' đang ở '+m.name+' • '+new Date().toLocaleString('vi-VN'); document.getElementById('checkinModal').classList.add('open'); window.__lastShot=img;};
+window.downloadCheckin=()=>{const a=document.createElement('a'); a.href=window.__lastShot; a.download='checkin-'+MAPS[state.map].short+'.png'; a.click();};
+window.heart=()=>{world.effect('heart'); world.jump();};
+window.wave=()=>{world.effect('heart'); world.jump(); alert('👋 '+state.user+' đang vẫy chào cả đoàn!');};
+window.nextMap=()=>{document.getElementById('flyOverlay').classList.add('show'); setTimeout(()=>{document.getElementById('flyOverlay').classList.remove('show'); goMap((state.map+1)%10);},1200);};
+window.backHub=()=>{world.backToHub(); document.getElementById('prayBtn').style.display='none'; document.querySelector('#mapTitle h1').textContent='🌀 Trung tâm 10 cổng dịch chuyển 6D'; document.querySelector('#mapTitle p').textContent='Cực quang, đèn lồng Hội An, hoa rơi • Bấm 1 cổng để bay tới • Đã đi '+state.visited.size+'/10 cổng';};
+window.shareMe=async()=>{const txt='Tôi đang ở '+MAPS[state.map].name+' nè! Link: '+location.href; try{if(navigator.share){await navigator.share({title:'Du lịch online',text:txt,url:location.href});}else{await navigator.clipboard.writeText(txt); alert('Đã copy link share:\n'+txt);}}catch(e){await navigator.clipboard.writeText(txt); alert('Đã copy link share:\n'+txt);}};
+document.querySelector('#passportModal button.ghost').onclick=()=>document.getElementById('passportModal').classList.remove('open');
+const renderPass=()=>{document.getElementById('passList').innerHTML=passportList().map((p,i)=>'<div class="passrow"><span>'+(i+1)+'. '+p.name+'</span><b>'+p.time+' phút</b></div>').join('');};
+document.querySelectorAll('button').forEach(b=>{if(b.textContent.includes('Hộ chiếu'))b.onclick=()=>{renderPass(); document.getElementById('passportModal').classList.add('open');};});
+</script></body></html>

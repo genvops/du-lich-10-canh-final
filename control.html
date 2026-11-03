@@ -1,0 +1,26 @@
+<!DOCTYPE html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>/control - Điều khiển Live</title><link rel="stylesheet" href="assets/style.css"><style>body{padding:64px 14px 60px}.wrap{max-width:760px;margin:auto}.quick{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}.quick button{padding:14px}</style></head>
+<body>
+<header class="topbar"><span class="live">🎛️ CONTROL</span><b>Dành cho host khi live</b><button class="pill" onclick="location.href='index.html'">🏠 Trang chính</button><button class="pill" onclick="location.href='live.html'">📺 Trang /live</button></header>
+<div class="wrap"><h2>🎛️ Bảng điều khiển Live</h2><p class="note">Bấm nút ở đây sẽ gửi lệnh sang tab Trang chính / /live đang mở cùng trình duyệt (qua BroadcastChannel). Nếu chưa mở tab kia, hãy mở <a href="index.html" target="_blank">trang chính</a> trước rồi bấm nút.</p>
+<h3>🗺️ Chuyển map nhanh</h3><div class="quick" id="maps"></div>
+<h3>✨ Hiệu ứng nhanh</h3><div class="quick">
+<button onclick="sendEffect('firework')">🎆 Pháo hoa tim</button><button onclick="sendEffect('heart')">❤️ Thả tim toàn đoàn</button><button onclick="sendEffect('lantern')">🏮 Thả đèn trời</button><button onclick="sendEffect('rain')">💸 Mưa tiền / hoa anh đào</button>
+</div>
+<h3>🎁 Giả lập quà tặng</h3><div class="quick">
+<button onclick="sendGift('Hoa hồng',10)">🌹 Hoa hồng x10 → Paris</button><button onclick="sendGift('Bóng bay',5)">🎈 Bóng bay x5 → Đèn trời</button><button onclick="sendGift('Du thuyền',1)">🛥️ Du thuyền x1 → Mưa tiền</button><button onclick="sendGift('Tim',50)">❤️ Tim x50</button>
+</div>
+<h3>💬 Comment / quà TikTok (mô phỏng + nhận từ tab live)</h3><div class="feed" id="feed"></div>
+<input id="manual" placeholder="Gõ comment rồi Enter: ví dụ 4, paris, tim" style="width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:12px;margin-top:10px">
+<p class="note">Lệnh comment: 1-10 hoặc hoi an / ha long / thai / kyoto / tu cam / paris / santorini / iceland / maldives / dubai để chuyển cổng, “tim” để thả tim.</p>
+</div><div id="giftPopup"></div>
+<script type="module">
+import {MAPS} from './assets/world.js'; import {state,addFeed,showGift} from './assets/app.js';
+const mapsEl=document.getElementById('maps'); MAPS.forEach((m,i)=>{const b=document.createElement('button'); b.textContent=m.emoji+' '+m.short; b.onclick=()=>{state.channel&&state.channel.postMessage({type:'map',index:i}); addFeed('Host','đã chuyển map → '+m.name);}; mapsEl.appendChild(b);});
+window.sendEffect=e=>{state.channel&&state.channel.postMessage({type:'effect',effect:e}); addFeed('Host','đã bật hiệu ứng '+e);};
+window.sendGift=(gift,count)=>{state.channel&&state.channel.postMessage({type:'gift',user:'ViewerDemo',gift,count}); showGift('ViewerDemo',gift,count); addFeed('ViewerDemo','đã tặng '+gift+' x'+count,gift);};
+document.getElementById('manual').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.value.trim()){const t=e.target.value.trim(); addFeed('Bạn',t); const mapBy={'1':0,'2':1,'3':2,'4':3,'5':4,'6':5,'7':6,'8':7,'9':8,'10':9}; if(mapBy[t]!==undefined)state.channel&&state.channel.postMessage({type:'map',index:mapBy[t]}); if(t.toLowerCase().includes('tim'))sendEffect('heart'); e.target.value='';}});
+if(state.channel){state.channel.onmessage=e=>{const d=e.data||{}; if(d.type==='chat')addFeed(d.user,d.text,d.gift); if(d.type==='gift')showGift(d.user,d.gift,d.count);};}
+// Feed mô phỏng để host thấy giao diện khi chưa có live thật
+const names=['Minh','Hằng','An','Linh','Tuấn']; setInterval(()=>{const u=names[Math.floor(Math.random()*names.length)]; const pool=['3','paris','tim','hoi an','10','thai','maldives']; addFeed(u,pool[Math.floor(Math.random()*pool.length)]);},7000);
+</script></body></html>
