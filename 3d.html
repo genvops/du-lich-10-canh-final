@@ -1,41 +1,73 @@
-<!DOCTYPE html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Du Lịch Vòng Quanh Thế Giới Online - Không cần visa</title><link rel="stylesheet" href="assets/style.css">
-<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}</script></head>
-<body>
-<header class="topbar"><span class="live">🔴 LIVE · <span id="liveCount">647 người đang du lịch cùng bạn</span></span><b>🌍 Du lịch online</b><span style="font-size:11px;background:rgba(0,0,0,.35);padding:6px 10px;border-radius:999px;white-space:nowrap">DESTINATION SYNC: 10/10 | 6D VIRTUAL TOURISM ACTIVE</span>
-<button class="pill" onclick="document.getElementById('passportModal').classList.add('open')">🏆 Hộ chiếu Vàng</button></header>
-<div class="musicbar"><b id="musicName">🎵 Đang phát: Nhạc Việt Nam - Hội An (Đàn Tranh + chuông chùa)</b><span class="note" style="color:#cbd5e1">Bay tới cổng nào, nhạc tự đổi sang nước đó (crossfade 2s). File mp3 trong public/music/ còn trống sẽ tự dùng nhạc Web Audio thay thế.</span><br>
-<button id="musicToggle">🔊 Tắt nhạc</button><button class="ghost" id="musicUploadLabel" onclick="document.getElementById('musicFile').click()">⬆️ Upload nhạc cho cổng này</button><button class="ghost" id="musicClear">↩️ Dùng nhạc mặc định</button>
-<input type="file" id="musicFile" accept="audio/*" hidden><br><label>Âm lượng <input type="range" id="musicVol" min="0" max="100" value="70"></label></div>
-<div class="ticker"><span id="tickerText">Minh vừa check-in Paris • Hằng vừa tới Nhật Bản • An vừa thả tim ở Hội An • Linh vừa tới Maldives •</span></div>
-<div id="canvasWrap"><canvas id="scene"></canvas><div id="mapTitle"><h1>🌀 Trung tâm 10 cổng dịch chuyển 6D</h1><p>Cực quang, đèn lồng Hội An, hoa rơi • Bấm 1 cổng để bay tới • Đã đi <span id="progress">1/10</span> cổng</p></div><div id="userBadge">👤 <span id="userName"></span> 🇻🇳</div></div>
-<div class="actions">
-<button onclick="checkin()">📸 Check-in</button><button onclick="heart()">❤️ Thả tim</button><button onclick="wave()">👋 Vẫy chào</button><button class="primary" onclick="nextMap()">✈️ Đi tiếp</button><button id="prayBtn" style="display:none;background:#facc15" onclick="pray()">🙏 Cầu an</button><button onclick="backHub()">🌀 Về trung tâm</button><button onclick="shareMe()">🔗 Share</button>
+<!DOCTYPE html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>5D TRAVEL PORTAL - 10 COUNTRIES</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#000;color:#fff;font-family:Arial,Helvetica,sans-serif;text-align:center;overflow-x:hidden;
+background-image:radial-gradient(#fff 1px,transparent 1.5px),radial-gradient(#ffd700 1px,transparent 1.5px);background-size:120px 120px,210px 210px;background-position:0 0,50px 80px}
+h1{color:#ffd700;font-size:clamp(26px,5vw,48px);margin:16px 10px 4px;text-shadow:0 0 24px gold}
+.sub{color:#ffe98a;margin:0 10px 8px}
+#coupleBar{display:inline-block;background:#ffd700;color:#000;font-weight:800;padding:10px 18px;border-radius:999px;margin:8px 0}
+#stage{position:relative;width:820px;max-width:96vw;height:760px;margin:8px auto 20px}
+#world{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:520px;max-width:88vw;z-index:1;background:radial-gradient(circle,rgba(255,215,0,.25),transparent 70%);border-radius:50%;padding:14px}
+#world img{width:100%;height:auto;display:block;border-radius:18px;filter:drop-shadow(0 0 22px gold) drop-shadow(0 0 44px rgba(255,215,0,.6))}
+#world .label{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);background:rgba(0,0,0,.65);padding:6px 14px;border-radius:999px;font-weight:800;color:#ffd700;white-space:nowrap}
+.portal{position:absolute;width:124px;height:124px;z-index:2;border:3px solid gold;border-radius:50%;overflow:hidden;cursor:pointer;box-shadow:0 0 20px rgba(255,215,0,.8);transition:transform .2s}
+.portal:hover{transform:scale(1.14);box-shadow:0 0 30px gold}
+.portal img{width:100%;height:100%;object-fit:cover;display:block}
+.portal .cap{position:absolute;left:0;right:0;bottom:0;padding:18px 6px 8px;background:linear-gradient(180deg,transparent,rgba(0,0,0,.9));font-size:12px;font-weight:800;line-height:1.2}
+.portal .cap span{display:block;font-size:20px}
+.couple{position:absolute;z-index:3;left:50%;top:58%;transform:translateX(-50%);font-size:52px;text-shadow:0 0 18px gold;animation:float 2.5s ease-in-out infinite;white-space:nowrap}
+@keyframes float{0%{transform:translate(-50%,0)}50%{transform:translate(-50%,-18px)}100%{transform:translate(-50%,0)}}
+.particle{position:fixed;z-index:0;width:6px;height:6px;background:#ffd700;border-radius:50%;box-shadow:0 0 10px gold;animation:fall linear infinite;opacity:.8}
+@keyframes fall{from{transform:translateY(-20px)}to{transform:translateY(105vh)}}
+.lantern{position:fixed;z-index:0;font-size:34px;animation:floaty 4s ease-in-out infinite}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-24px)}}
+button.big{border:0;border-radius:999px;padding:14px 24px;font-size:17px;font-weight:800;cursor:pointer;background:#ffd700;margin:6px}
+.dest{position:fixed;inset:0;z-index:50;display:none;background:#000}
+.dest.open{display:block}.dest img.bg{width:100%;height:100%;object-fit:cover}
+.dest .shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.15),rgba(0,0,0,.85))}
+.dest .txt{position:absolute;left:50%;bottom:36px;transform:translateX(-50%);width:92%;text-align:center}
+.dest h2{font-size:clamp(30px,6vw,58px);color:#ffd700;margin:0;text-shadow:0 4px 24px #000}
+.dest .veh{font-size:64px;animation:float 2.5s ease-in-out infinite;display:inline-block}
+.dest .btns button{border:0;border-radius:999px;padding:13px 18px;font-weight:800;cursor:pointer;margin:4px;background:#fff}
+.dest .btns button.primary{background:#f59e0b;color:#fff}
+.dest .close{position:absolute;top:16px;right:14px;z-index:2;background:#fff;border:0;border-radius:999px;padding:10px 16px;font-weight:800;cursor:pointer}
+@media(max-width:700px){#stage{height:620px}.portal{width:86px;height:86px}.portal .cap{font-size:10px}.couple{font-size:40px}#world{width:320px}}
+</style></head><body>
+<div id="lanterns"></div>
+<h1>✨ 5D TRAVEL PORTAL - 10 COUNTRIES ✨</h1>
+<p class="sub">Bản đồ thế giới vàng ở giữa • 10 cổng tròn vàng xung quanh • Ảnh thật, không Three.js, không khối vuông tròn xám</p>
+<div id="coupleBar">👨🏻‍🌾👩🏻‍🌾 Cặp đôi áo bà ba nâu + khăn rằn • Đang ngồi: 🛶 xuồng ba lá quanh rặng dừa Miền Tây</div>
+<div id="stage">
+<div id="world"><img src="https://images.fineartamerica.com/images/artworkimages/medium/3/gold-world-map-2-athena-mckinzie.jpg" alt="Bản đồ thế giới vàng phát sáng" onerror="this.onerror=null;this.src='https://www.mahavirrefinery.com/wp-content/uploads/2026/01/world-map.jpg'"><div class="label">🌍 BẢN ĐỒ THẾ GIỚI VÀNG</div></div>
+<div class="couple" id="couple">👨🏻‍🌾 🛶 👩🏻‍🌾</div>
 </div>
-<nav class="mapbar" id="mapBar"></nav>
-<footer>Du lịch online - Không cần visa - Share cho bạn bè cùng đi • <a href="live.html" style="color:#fde68a">Vào trang /live TikTok</a> • <a href="control.html" style="color:#fde68a">Trang /control cho host</a> • Số LIVE là mô phỏng trong game cho vui.</footer>
-<div id="flyOverlay"><div>✈️</div><p>Đang bay tới map tiếp theo...</p></div><div id="giftPopup"></div><div id="prayText">🙏 CẦU AN<br><span style="font-size:22px">BÌNH AN • MAY MẮN • TÀI LỘC</span></div>
-<div class="modal" id="passportModal"><div class="card"><h2>🏆 Hộ chiếu Vàng</h2><p class="note">Top 10 người đi hết 10 cổng nhanh nhất (trong game này). Bạn đi hết 10 cổng sẽ tự lên bảng.</p><div id="passList"></div><button class="ghost" onclick="document.getElementById('passportModal').classList.remove('open')">Đóng</button></div></div>
-<div class="modal" id="checkinModal"><div class="card"><h2>📸 Check-in thành công!</h2><img id="checkinImg" alt="Ảnh check-in"><p id="checkinText"></p><button onclick="downloadCheckin()">⬇️ Tải ảnh</button><button onclick="shareMe()">🔗 Share</button><button class="ghost" onclick="document.getElementById('checkinModal').classList.remove('open')">Đóng</button></div></div>
-<script type="module">
-import {MAPS,createWorld} from './assets/world.js'; import {state,initCommon,buildMapBar,startFakeLive,passportList} from './assets/app.js'; import {createMusic} from './assets/music.js';
-const world=createWorld(document.getElementById('scene')); const goMap=initCommon(world); buildMapBar(goMap); startFakeLive();
-const music=createMusic(); window.__music=music; music.onBeat(()=>world.pulseBeat()); music.updateLabel();
-document.getElementById('userName').textContent=state.user; world.setUserName(state.user);
-document.getElementById('musicToggle').onclick=()=>music.toggle();
-document.getElementById('musicVol').oninput=e=>music.setVolume(e.target.value/100);
-document.getElementById('musicFile').onchange=e=>{if(e.target.files[0])music.uploadForCurrent(e.target.files[0]);};
-document.getElementById('musicClear').onclick=()=>music.clearUploadForCurrent();
-document.addEventListener('pointerdown',()=>{if(state.map===0&&!window.__musicStarted){window.__musicStarted=true;music.playMap(0);}}, {once:true});
-window.pray=()=>{world.bell(); world.pray(); world.effect('firework'); music.fireworkSound(); const t=document.getElementById('prayText'); t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); alert('🙏 Bạn đang chắp tay lạy, cầu an bình an may mắn!');};
-window.checkin=()=>{const img=world.screenshot(); const m=MAPS[state.map]; document.getElementById('checkinImg').src=img; document.getElementById('checkinText').textContent=state.user+' đang ở '+m.name+' • '+new Date().toLocaleString('vi-VN'); document.getElementById('checkinModal').classList.add('open'); window.__lastShot=img;};
-window.downloadCheckin=()=>{const a=document.createElement('a'); a.href=window.__lastShot; a.download='checkin-'+MAPS[state.map].short+'.png'; a.click();};
-window.heart=()=>{world.effect('heart'); world.jump();};
-window.wave=()=>{world.effect('heart'); world.jump(); alert('👋 '+state.user+' đang vẫy chào cả đoàn!');};
-window.nextMap=()=>{document.getElementById('flyOverlay').classList.add('show'); setTimeout(()=>{document.getElementById('flyOverlay').classList.remove('show'); goMap((state.map+1)%10);},1200);};
-window.backHub=()=>{world.backToHub(); document.getElementById('prayBtn').style.display='none'; document.querySelector('#mapTitle h1').textContent='🌀 Trung tâm 10 cổng dịch chuyển 6D'; document.querySelector('#mapTitle p').textContent='Cực quang, đèn lồng Hội An, hoa rơi • Bấm 1 cổng để bay tới • Đã đi '+state.visited.size+'/10 cổng';};
-window.shareMe=async()=>{const txt='Tôi đang ở '+MAPS[state.map].name+' nè! Link: '+location.href; try{if(navigator.share){await navigator.share({title:'Du lịch online',text:txt,url:location.href});}else{await navigator.clipboard.writeText(txt); alert('Đã copy link share:\n'+txt);}}catch(e){await navigator.clipboard.writeText(txt); alert('Đã copy link share:\n'+txt);}};
-document.querySelector('#passportModal button.ghost').onclick=()=>document.getElementById('passportModal').classList.remove('open');
-const renderPass=()=>{document.getElementById('passList').innerHTML=passportList().map((p,i)=>'<div class="passrow"><span>'+(i+1)+'. '+p.name+'</span><b>'+p.time+' phút</b></div>').join('');};
-document.querySelectorAll('button').forEach(b=>{if(b.textContent.includes('Hộ chiếu'))b.onclick=()=>{renderPass(); document.getElementById('passportModal').classList.add('open');};});
+<div><button class="big" onclick="randomCountry()">🎲 BAY NGẪU NHIÊN 1 NƯỚC</button> <button class="big" style="background:#fff" onclick="location.href='index.html'">🏠 Về trang chính ảnh thật</button></div>
+<p class="sub" style="margin:14px">🏮 Đèn lồng • ✨ Hạt vàng bay • Bấm 1 cổng để bay vào cảnh thật nước đó, cặp đôi sẽ đổi sang phương tiện của nước đó</p>
+<div class="dest" id="dest"><button class="close" onclick="closeDest()">✕ Đóng</button><img class="bg" id="destImg" alt="Ảnh thật nước đó"><div class="shade"></div><div class="txt"><div class="veh" id="destVeh"></div><h2 id="destName"></h2><p id="destDesc"></p><p id="destCouple"></p><div class="btns"><button onclick="checkin()">📸 Check-in</button><button onclick="heart()">❤️ Thả tim</button><button class="primary" onclick="nextCountry()">✈️ Đi nước tiếp theo</button><button onclick="closeDest()">🌀 Về bản đồ thế giới</button></div></div></div>
+<script>
+const COUNTRIES=[
+{name:'VIỆT NAM',vehicle:'🛶',vehicleName:'xuồng ba lá quanh rặng dừa Miền Tây',outfit:'áo bà ba nâu + khăn rằn',desc:'Sông Mekong rặng dừa, xuồng ba lá, cặp đôi áo bà ba — cảnh chính',img:'https://cdn1.vietnamtourism.org.vn/images/content/ad9b105883e094b155ca9c34797dfe85.jpg',alt:'https://www.moskito.iexpert.eu/wp-content/uploads/2019/10/vietnam-mekong-boot-kokosnu.jpg'},
+{name:'THÁI LAN',vehicle:'🛺',vehicleName:'tuk-tuk',outfit:'áo bà ba nâu + khăn rằn',desc:'Tuk-tuk chạy qua chùa vàng Thái Lan lấp lánh',img:'https://www.azurecollection.com/media/catalog/category/bangkok3.jpg',alt:'http://souvenirmagnetshop.com/wp-content/uploads/2026/04/bangkok-tuk-tuk-golden-temple-street-scene-thailand.webp'},
+{name:'NHẬT BẢN',vehicle:'🚄',vehicleName:'tàu Shinkansen',outfit:'kimono + áo bà ba',desc:'Kimono, hoa anh đào rơi, tàu Shinkansen vút qua',img:'https://www.ttnmedia.com/wp-content/uploads/2024/02/TTNmedia_News_20240201_JR.jpg',alt:'https://assets.st-note.com/production/uploads/images/244936631/rectangle_large_type_2_ad6053a1a898b113d83b2fb3e54dd841.jpg?width=1280'},
+{name:'HÀN QUỐC',vehicle:'🚃',vehicleName:'tàu điện Seoul',outfit:'hanbok + áo bà ba',desc:'Hanbok, cung điện Gyeongbokgung, Seoul rực rỡ',img:'https://static.tildacdn.biz/tild6134-6637-4666-b464-653439386330/Gyeongbokgung-palace.jpg',alt:'https://cdn1.vietnamtourism.org.vn/images/content/ad9b105883e094b155ca9c34797dfe85.jpg'},
+{name:'TRUNG QUỐC',vehicle:'🚠',vehicleName:'cáp treo Vạn Lý Trường Thành',outfit:'áo bà ba nâu + khăn rằn',desc:'Vạn Lý Trường Thành uốn lượn trên núi, hoành tráng',img:'https://news.cgtn.com/news/2023-09-23/Live-Unveiling-great-Chinese-architecture-and-cultural-heritage-1nkk18Q0LQI/img/d04ced08ce9c4df9800cc9364130937d/d04ced08ce9c4df9800cc9364130937d.png',alt:'https://mediaim.expedia.com/destination/1/339748b6d2ac7e127e541e8e8d51a634.jpg?impolicy=fcrop&'},
+{name:'PHÁP',vehicle:'🚕',vehicleName:'taxi Paris',outfit:'áo bà ba nâu + khăn rằn',desc:'Tháp Eiffel về đêm, Paris lãng mạn, ảnh thật',img:'https://i.pinimg.com/originals/51/a4/5f/51a45f0f7ac80ad4366150152cd7a10e.jpg',alt:'https://miro.medium.com/v2/resize:fit:828/0*A8Xrqkkir9GyDZ5s'},
+{name:'MỸ',vehicle:'🚖',vehicleName:'taxi vàng New York',outfit:'áo bà ba nâu + khăn rằn',desc:'Tượng Nữ Thần Tự Do, New York, ảnh thật',img:'https://www.nps.gov/stli/planyourvisit/images/statue-from-boat-NYC-background.jpg?maxwidth=1300&maxheight=1300&autorotate=false&format=webp',alt:'https://gotourismguides.com/nyc/wp-content/uploads/2016/04/new-york-city-statue-of-liberty-main.jpg'},
+{name:'DUBAI',vehicle:'🐪',vehicleName:'lạc đà sa mạc',outfit:'áo bà ba nâu + khăn rằn',desc:'Sa mạc, lạc đà, Burj Khalifa chọc trời về đêm',img:'https://media01.stockfood.com/largepreviews/MjIwNDQ0MDI1Ng==/71110976-Middle-Eastern-man-walking-camels-near-city.jpg',alt:'https://images.prismic.io/11prop-blog/ZkOk6iol0Zci9H_w_ApartmentstoEnjoyBurjKhalifaNightViews.jpg?auto=format%2Ccompress&fit=max&w=3840'},
+{name:'BALI',vehicle:'🛵',vehicleName:'xe máy Bali',outfit:'áo bà ba nâu + khăn rằn',desc:'Cổng trời Bali, biển xanh, ảnh thật',img:'https://alexasia.de/wp-content/uploads/nusa-penida-sehenswuerdigkeiten-20-600x902.jpg.webp',alt:'https://thebalisun.com/wp-content/uploads/2024/02/These-Seven-Visa-Categories-Are-Exempt-From-Balis-New-Tourism-Tax-960x640.jpg.webp'},
+{name:'SINGAPORE',vehicle:'🚇',vehicleName:'tàu MRT Marina Bay',outfit:'áo bà ba nâu + khăn rằn',desc:'Marina Bay về đêm, Singapore lung linh, ảnh thật',img:'https://mice-travel-solutions.com.ua/wp-content/uploads/2025/03/Marina-bay.jpg',alt:'https://stg-inspiration-staging.kinsta.cloud/wp-content/uploads/2023/10/Marina-Bay-Sands-Singapore-1024x683.jpg'},
+];
+const POS=[[38,0],[62,4],[80,14],[86,32],[82,50],[70,64],[78,78],[58,88],[36,90],[16,80]];
+let current=0;
+const stage=document.getElementById('stage');
+COUNTRIES.forEach((c,i)=>{const p=document.createElement('div');p.className='portal';const pos=POS[i];p.style.left=pos[0]+'%';p.style.top=pos[1]+'%';p.innerHTML='<img src="'+c.img+'" alt="Ảnh thật '+c.name+'" onerror="this.onerror=null;this.src=\''+c.alt+'\'"><div class="cap"><span>'+c.vehicle+'</span>'+c.name+'</div>';p.onclick=()=>goCountry(i);stage.appendChild(p);});
+for(let i=0;i<28;i++){const d=document.createElement('div');d.className='particle';d.style.left=Math.random()*100+'vw';d.style.animationDuration=(6+Math.random()*8)+'s';d.style.animationDelay=(-Math.random()*10)+'s';document.body.appendChild(d);}
+const lan=document.getElementById('lanterns');['🏮','🏮','🏮','🏮'].forEach((e,i)=>{const s=document.createElement('span');s.className='lantern';s.textContent=e;s.style.left=(8+i*24)+'%';s.style.top=(12+i*18)+'%';s.style.animationDelay=(i*.7)+'s';lan.appendChild(s);});
+function updateCouple(i){const c=COUNTRIES[i];document.getElementById('couple').textContent='👨🏻‍🌾 '+c.vehicle+' 👩🏻‍🌾';document.getElementById('coupleBar').textContent='👨🏻‍🌾👩🏻‍🌾 Cặp đôi '+c.outfit+' • Đang ngồi: '+c.vehicle+' '+c.vehicleName+' tại '+c.name;}
+function goCountry(i){current=i;updateCouple(i);const c=COUNTRIES[i];const im=document.getElementById('destImg');im.src=c.img;im.onerror=function(){this.onerror=null;this.src=c.alt};document.getElementById('destVeh').textContent='👨🏻‍🌾 '+c.vehicle+' 👩🏻‍🌾';document.getElementById('destName').textContent=c.vehicle+' '+c.name;document.getElementById('destDesc').textContent=c.desc;document.getElementById('destCouple').textContent='Cặp đôi '+c.outfit+' đang ngồi '+c.vehicleName+' • Ảnh thật '+c.name;document.getElementById('dest').classList.add('open');}
+function closeDest(){document.getElementById('dest').classList.remove('open');}
+function nextCountry(){goCountry((current+1)%10);}
+function randomCountry(){goCountry(Math.floor(Math.random()*10));}
+function checkin(){alert('📸 Check-in thành công tại '+COUNTRIES[current].name+'! Cặp đôi '+COUNTRIES[current].outfit+' đang ngồi '+COUNTRIES[current].vehicleName);}
+function heart(){alert('❤️ Cả đoàn thả tim tại '+COUNTRIES[current].name+'!');}
 </script></body></html>
