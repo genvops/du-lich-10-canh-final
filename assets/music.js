@@ -48,7 +48,7 @@ export function createMusic(){
   if(mp3){stopSynth();mp3Mode=true;mp3Audio=mp3;mp3.volume=0;try{await mp3.play();}catch(e){mp3Mode=false;startSynth(idx);updateLabel();return} fadeAudio(mp3,volume,2000);}
   else {mp3Mode=false;mp3Audio=null;startSynth(idx);if(master)master.gain.setTargetAtTime(volume,ctx.currentTime,.4);}
   updateLabel();}
- function updateLabel(){const el=document.getElementById('musicName');if(el)el.textContent=mp3Mode?('🎵 Đang phát MP3: '+MUSIC_FILES[current]):('🎵 Đang phát: '+MUSIC_NAMES[current]);const up=document.getElementById('musicUploadLabel');if(up)up.textContent='⬆️ Upload nhạc cho cổng này';}
+ function updateLabel(){const idx=current>=0?current:0;const el=document.getElementById('musicName');if(el)el.textContent=mp3Mode?('🎵 Đang phát MP3: '+MUSIC_FILES[idx]):('🎵 Đang phát: '+MUSIC_NAMES[idx]);const up=document.getElementById('musicUploadLabel');if(up)up.textContent='⬆️ Upload nhạc cho cổng này';}
  function setEnabled(v){enabled=v;if(!v){stopSynth();if(mp3Audio)mp3Audio.pause();}else if(current>=0)playMap(current);updateLabel();const b=document.getElementById('musicToggle');if(b)b.textContent=enabled?'🔊 Tắt nhạc':'🔇 Bật nhạc';}
  return {playMap,setVolume:v=>{volume=v;if(master)master.gain.value=v;if(mp3Audio)mp3Audio.volume=v;},toggle:()=>setEnabled(!enabled),isEnabled:()=>enabled,currentName:()=>MUSIC_NAMES[current]||'',currentFile:()=>MUSIC_FILES[current]||'',isMp3:()=>mp3Mode,onBeat:cb=>beatCb=cb,
   boost:()=>{boostUntil=Date.now()+4000;if(master)master.gain.setTargetAtTime(Math.min(1,volume*1.6),ctx?ctx.currentTime:0,.2);setTimeout(()=>{if(master)master.gain.setTargetAtTime(volume,ctx.currentTime,.5);},4000);if(beatCb)beatCb(1);},

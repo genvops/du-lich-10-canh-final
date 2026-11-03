@@ -23,8 +23,8 @@ function auroraTexture(c1,c2){const c=document.createElement('canvas');c.width=5
 export function createWorld(canvas){
  const renderer=new THREE.WebGLRenderer({canvas,antialias:true,preserveDrawingBuffer:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));
  const scene=new THREE.Scene();scene.background=new THREE.Color(0x0b1026);scene.fog=new THREE.Fog(0x0b1026,55,130);
- const camera=new THREE.PerspectiveCamera(58,1,.1,300);camera.position.set(0,18,30);
- const controls=new OrbitControls(camera,canvas);controls.target.set(0,2,0);controls.maxPolarAngle=1.45;controls.minDistance=8;controls.maxDistance=65;controls.enableDamping=true;
+ const camera=new THREE.PerspectiveCamera(55,1,.1,300);camera.position.set(0,20,44);
+ const controls=new OrbitControls(camera,canvas);controls.target.set(0,3,0);controls.maxPolarAngle=1.45;controls.minDistance=10;controls.maxDistance=70;controls.enableDamping=true;
  scene.add(new THREE.AmbientLight(0xffffff,.9));const sun=new THREE.DirectionalLight(0xffffff,1);sun.position.set(20,30,10);scene.add(sun);
  const cyanLight=new THREE.PointLight(0x22d3ee,2,45);cyanLight.position.set(0,4,0);scene.add(cyanLight);
  let worldGroup=null,touristGroup=null,anim={},effects=[],portals=[],mode='hub',current=0,userAvatar=null,userName='Bạn',transitioning=null,beat=0;
