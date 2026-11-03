@@ -1,0 +1,70 @@
+<!DOCTYPE html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>3D People Demo - Cặp đôi áo bà ba + 10 cổng</title>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}</script>
+<style>body{margin:0;background:#000;color:#fff;font-family:Arial,sans-serif;overflow:hidden}
+#ui{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:2;text-align:center;background:rgba(0,0,0,.6);padding:12px 18px;border-radius:16px;border:2px solid gold}
+#ui h1{margin:0;color:#ffd700;font-size:20px}#ui p{margin:4px 0;font-size:13px;color:#ffe98a}
+#info{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);z-index:2;background:rgba(0,0,0,.7);padding:10px 16px;border-radius:999px;font-weight:800}
+button{border:0;border-radius:999px;padding:10px 16px;font-weight:800;cursor:pointer;background:#ffd700;margin:2px}
+canvas{display:block}</style></head><body>
+<div id="ui"><h1>✨ 3D PEOPLE DEMO ✨</h1><p>Cặp đôi áo bà ba nâu + khăn rằn ở giữa • Người 3D chibi có đầu, tóc, tay, chân • Xoay chuột để xem quanh • Bấm 1 cổng để bay tới</p><p><button onclick="waveAll()">👋 Vẫy tay tất cả</button> <button onclick="prayAll()">🙏 Chắp tay cầu an</button> <button onclick="location.href='3d.html'">🏠 Về bản ảnh thật 10 nước</button></p></div>
+<div id="info">📍 Đang ở: Trung tâm 10 cổng • Bấm 1 cổng tròn để bay</div>
+<script type="module">
+import * as THREE from 'three'; import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+const scene=new THREE.Scene(); scene.background=new THREE.Color(0x050510); scene.fog=new THREE.Fog(0x050510,60,120);
+const camera=new THREE.PerspectiveCamera(55,innerWidth/innerHeight,.1,300); camera.position.set(0,14,34);
+const renderer=new THREE.WebGLRenderer({antialias:true}); renderer.setSize(innerWidth,innerHeight); document.body.appendChild(renderer.domElement);
+const controls=new OrbitControls(camera,renderer.domElement); controls.target.set(0,2,0); controls.maxPolarAngle=1.45; controls.enableDamping=true;
+scene.add(new THREE.AmbientLight(0xffffff,.7)); const sun=new THREE.DirectionalLight(0xffe9a8,1.2); sun.position.set(10,20,10); scene.add(sun);
+const gold=new THREE.PointLight(0xffd700,2,60); gold.position.set(0,8,0); scene.add(gold);
+// Sàn hologram
+const floor=new THREE.Mesh(new THREE.CircleGeometry(26,64),new THREE.MeshStandardMaterial({color:0x0b1a3a,transparent:true,opacity:.85})); floor.rotation.x=-Math.PI/2; scene.add(floor);
+const grid=new THREE.GridHelper(52,26,0xffd700,0x1e3a8a); grid.position.y=.02; grid.material.transparent=true; grid.material.opacity=.35; scene.add(grid);
+// Đèn lồng vàng bay
+const lanterns=[]; for(let i=0;i<14;i++){const m=new THREE.Mesh(new THREE.SphereGeometry(.45,16,16),new THREE.MeshStandardMaterial({color:0xffb300,emissive:0xff8f00,emissiveIntensity:1})); m.position.set((Math.random()-.5)*44,4+Math.random()*10,(Math.random()-.5)*44); scene.add(m); lanterns.push(m);}
+// Người 3D chibi: đầu + tóc + thân áo + tay + chân, không phải viên nang
+function makePerson({shirt=0x8d6e63,skin=0xffd9b3,hair=0x1a1a1a,hat=null,scale=1}={}){
+ const g=new THREE.Group();
+ const mat=(c)=>new THREE.MeshStandardMaterial({color:c,roughness:.7});
+ const head=new THREE.Mesh(new THREE.SphereGeometry(.55,24,24),mat(skin)); head.position.y=2.15; g.add(head);
+ const hairM=new THREE.Mesh(new THREE.SphereGeometry(.57,24,24,0,Math.PI*2,0,Math.PI*.55),mat(hair)); hairM.position.y=2.25; g.add(hairM);
+ const eyeMat=new THREE.MeshBasicMaterial({color:0x111111});
+ [-.2,.2].forEach(x=>{const e=new THREE.Mesh(new THREE.SphereGeometry(.06,8,8),eyeMat); e.position.set(x,2.2,.52); g.add(e);});
+ const body=new THREE.Mesh(new THREE.CapsuleGeometry(.5,.7,6,16),mat(shirt)); body.position.y=1.15; g.add(body);
+ if(hat){const h=new THREE.Mesh(new THREE.ConeGeometry(.7,.5,20),mat(hat)); h.position.y=2.75; g.add(h);}
+ const armL=new THREE.Group(),armR=new THREE.Group(); armL.position.set(-.65,1.55,0); armR.position.set(.65,1.55,0);
+ const armGeo=new THREE.CapsuleGeometry(.14,.5,4,12);
+ const aL=new THREE.Mesh(armGeo,mat(shirt)); aL.position.y=-.35; armL.add(aL);
+ const aR=new THREE.Mesh(armGeo,mat(shirt)); aR.position.y=-.35; armR.add(aR);
+ g.add(armL,armR);
+ const legGeo=new THREE.CapsuleGeometry(.16,.45,4,12);
+ [-.25,.25].forEach(x=>{const l=new THREE.Mesh(legGeo,mat(0x333333)); l.position.set(x,.35,0); g.add(l);});
+ g.scale.setScalar(scale); g.userData={armL,armR,baseY:g.position.y,phase:Math.random()*6};
+ return g;
+}
+const people=[];
+const couple=[makePerson({shirt:0x6d4c41,hair:0x111111,hat:0xd7ccc8}),makePerson({shirt:0x8d6e63,hair:0x222222,scale:.95})];
+couple[0].position.set(-.9,0,2); couple[1].position.set(.9,0,2); couple.forEach(p=>{scene.add(p);people.push(p);});
+// Du khách khác quanh trung tâm
+const colors=[0xef4444,0x3b82f6,0x22c55e,0xec4899,0xf59e0b,0xa855f7];
+for(let i=0;i<12;i++){const p=makePerson({shirt:colors[i%colors.length],hair:[0x111111,0x6b4226,0x000000][i%3]}); const a=i/12*Math.PI*2; p.position.set(Math.cos(a)*7,0,Math.sin(a)*7); p.rotation.y=-a+Math.PI/2; scene.add(p); people.push(p);}
+// 10 cổng tròn vàng + tên nước
+const NAMES=['VIỆT NAM','THÁI LAN','NHẬT BẢN','HÀN QUỐC','TRUNG QUỐC','PHÁP','MỸ','DUBAI','BALI','SINGAPORE'];
+const COLORS=[0x16a34a,0xf59e0b,0xec4899,0x3b82f6,0xdc2626,0x2563eb,0x0ea5e9,0xf97316,0x14b8a6,0xef4444];
+const portals=[]; const ray=new THREE.Raycaster(), mouse=new THREE.Vector2();
+NAMES.forEach((n,i)=>{const a=i/10*Math.PI*2; const x=Math.cos(a)*17,z=Math.sin(a)*17;
+ const ring=new THREE.Mesh(new THREE.TorusGeometry(2.2,.18,16,48),new THREE.MeshStandardMaterial({color:0xffd700,emissive:0xffd700,emissiveIntensity:.8}));
+ ring.position.set(x,3.2,z); ring.lookAt(camera.position); scene.add(ring);
+ const disc=new THREE.Mesh(new THREE.CircleGeometry(2,40),new THREE.MeshStandardMaterial({color:COLORS[i],transparent:true,opacity:.9}));
+ disc.position.set(x,3.2,z); disc.lookAt(camera.position); disc.userData={index:i,name:n}; scene.add(disc); portals.push(disc);
+ const glow=new THREE.PointLight(COLORS[i],1.2,12); glow.position.set(x,3.2,z); scene.add(glow);
+});
+function setInfo(t){document.getElementById('info').textContent=t;}
+window.waveAll=()=>{people.forEach(p=>{p.userData.waving=true; setTimeout(()=>p.userData.waving=false,2500);}); setInfo('👋 Cả đoàn đang vẫy tay!');};
+window.prayAll=()=>{people.forEach(p=>{p.userData.praying=true; p.userData.armL.rotation.x=-1.2; p.userData.armR.rotation.x=-1.2; setTimeout(()=>{p.userData.praying=false; p.userData.armL.rotation.x=0; p.userData.armR.rotation.x=0;},3000);}); setInfo('🙏 Cặp đôi đang chắp tay cầu an — Bình an • May mắn • Tài lộc');};
+renderer.domElement.addEventListener('click',e=>{mouse.set(e.clientX/innerWidth*2-1,-(e.clientY/innerHeight)*2+1); ray.setFromCamera(mouse,camera); const hit=ray.intersectObjects(portals)[0]; if(hit){const d=hit.object.userData; setInfo('✈️ Đang bay tới '+d.name+' — cặp đôi áo bà ba đang ngồi phương tiện nước đó!'); camera.position.set(hit.object.position.x*.6,10,hit.object.position.z*.6+8);}}});
+let t=0; (function loop(){requestAnimationFrame(loop); t+=.016; controls.update();
+ people.forEach(p=>{const u=p.userData; p.position.y=u.baseY+Math.abs(Math.sin(t*2+u.phase))*.15; if(u.waving){u.armR.rotation.z=-2.4+Math.sin(t*12)*.5;} else if(!u.praying){u.armR.rotation.z=0;} u.armL.rotation.z=u.praying?-0.4:0;});
+ lanterns.forEach((m,i)=>{m.position.y=4+Math.sin(t*.8+i)*1.5;}); gold.intensity=1.6+Math.sin(t*3)*.6; renderer.render(scene,camera);})();
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth,innerHeight);});
+</script></body></html>
